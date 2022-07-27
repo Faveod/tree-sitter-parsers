@@ -1,5 +1,7 @@
 # Tree-Sitter Build Parsers
 
+[![cd](https://github.com/stackmystack/tree-sitter-parsers/actions/workflows/cd.yml/badge.svg)](https://github.com/stackmystack/tree-sitter-parsers/actions/workflows/cd.yml)
+
 This repository contains a script to create your favourite shared library
 `tree-sitter-{parser}`.
 
@@ -28,3 +30,25 @@ anything to it.  **so if you want to build agains a specific tag or commit, just
 ## Artefacts
 
 The output of `./lang LANGUAGE` is in `lib/libtree-sitter-LANGUAGE.{dylib, so}`.
+
+# Supported Archs
+
+## Linux
+
+- x86_64-linux-gnu
+- arm-linux-gnueabi
+- arm-linux-gnueabihf
+- aarch64-linux-gnu
+- mipsel-linux-gnu
+- powerpc64le-linux-gnu
+
+## Macos
+
+- x86_64-intel
+
+NO SUPPORT FOR ARM (M1, M2, etc). Will land sometime soon, maybe. This requres a
+patch to `tree-sitter`'s makefile itself.
+
+## Windows
+
+no.
