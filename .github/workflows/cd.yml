@@ -7,6 +7,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
+       os: [ubuntu, macos]
        lang:
          - c
          # - cpp
@@ -21,22 +22,31 @@ jobs:
          - aarch64-linux-gnu
          - mipsel-linux-gnu
          - powerpc64le-linux-gnu
-         - x86_64-apple-darwin
-         - x86_64h-apple-darwin
-         - i386-apple-darwin
+         #
+         # FIXME: tree-sitter has a known (by me) bug by now:
+         #          ld: unknown option -soname
+         # It should be patched to support
+         # - x86_64-apple-darwin
+         # - x86_64h-apple-darwin
+         # - i386-apple-darwin
          - x86_64-w64-mingw32
          - i686-w64-mingw32
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build ${{ matrix.lang }} for ${{ matrix.triplet }}
+        if: ${{ matrix.os == 'ubuntu' }}
         run: |
           docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.triplet }} multiarch/crossbuild  ./lang ${{ matrix.lang }}
+      - name: Build ${{ matrix.lang }} for macos
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          ./lang ${{ matrix.lang }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.vars.outputs.sha_short }}
+          release_name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
           draft: true
           files: |
             ./lib/*
