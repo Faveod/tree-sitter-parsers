@@ -43,7 +43,13 @@ for lang in "$@"
 do
 
   GET=tree-sitter-$lang
-  OUT="$PWD/lib/libtree-sitter-$lang.$EXT"
+  if [ -z "$CROSS_TRIPLE" ]
+  then
+    OUT="$PWD/lib/libtree-sitter-$lang.$EXT"
+  else
+    OUT="$PWD/lib/libtree-sitter-$lang-$CROSS_TRIPLE.$EXT"
+  fi
+
 
   mkdir -p "lib"
 

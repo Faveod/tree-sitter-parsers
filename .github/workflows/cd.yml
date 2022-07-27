@@ -7,7 +7,6 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       os: [ubuntu, macos]
        lang:
          - c
          - cpp
@@ -15,12 +14,24 @@ jobs:
          - javascript
          - ruby
          - rust
-    runs-on: ${{ matrix.os }}-latest
+       triplets:
+         - x86_64-linux-gnu
+         - arm-linux-gnueabi
+         - arm-linux-gnueabihf
+         - aarch64-linux-gnu
+         - mipsel-linux-gnu
+         - powerpc64le-linux-gnu
+         - x86_64-apple-darwin
+         - x86_64h-apple-darwin
+         - i386-apple-darwin
+         - x86_64-w64-mingw32
+         - i686-w64-mingw32
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build ${{ matrix.lang }}
+      - name: Build ${{ matrix.lang }} for ${{ matrix.triplet }}
         run: |
-          ./lang ${{ matrix.lang }}
+          docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.triplet }} multiarch/crossbuild  ./lang ${{ matrix.lang }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
