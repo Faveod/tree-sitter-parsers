@@ -15,7 +15,7 @@ jobs:
          - javascript
          # - ruby
          # - rust
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Build ${{ matrix.lang }}
         run: |
