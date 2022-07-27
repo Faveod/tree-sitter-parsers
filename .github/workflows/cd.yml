@@ -17,6 +17,7 @@ jobs:
          # - rust
     runs-on: ${{ matrix.os }}-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Build ${{ matrix.lang }}
         run: |
           ./lang ${{ matrix.lang }}
