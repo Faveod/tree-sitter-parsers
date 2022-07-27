@@ -1,0 +1,53 @@
+name: cd
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    strategy:
+     fail-fast: false
+     matrix:
+       os: [ubuntu, macos]
+       lang:
+         - c
+         - cpp
+         - java
+         - javascript
+         - ruby
+         - rust
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Build ${{ matrix.lang }}
+      - run: |
+          ./lang ${{ matrix.lang }}
+      - name: upload ubuntu artifacts
+        if: ${{ matrix.os == 'ubuntu' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lib/libtree-sitter-${{ matrix.lang }}.so
+          asset_name: libtree-sitter-${{ matrix.lang }}.so
+      - name: upload macos artifacts
+        if: ${{ matrix.os == 'macos' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./lib/libtree-sitter-${{ matrix.lang }}.dylib
+          asset_name: libtree-sitter-${{ matrix.lang }}.dylib

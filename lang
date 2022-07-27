@@ -1,0 +1,86 @@
+#! /usr/bin/env sh
+
+set -e
+set -x
+
+case "$OSTYPE" in
+  darwin*)
+      EXT=dylib
+      CC=cc
+      CXX=c++
+      ;;
+  *)
+      EXT=so
+      CC=gcc
+      CXX=g++
+      ;;
+esac
+
+# ################################################ #
+#          Clone and Build tree-sitter             #
+# ################################################ #
+#
+# NOTE: we delete produced .{dylib, so} files because they just mess with static
+# building step
+
+TSS="$PWD/tree-sitter" # Tree Sitter Source
+
+if [ ! -d "$TSS" ]
+then
+  git clone https://github.com/tree-sitter/tree-sitter
+  pushd tree-sitter
+  git checkout tags/v0.20.6
+  make
+  popd
+fi
+
+
+# ################################################ #
+#     Clone then Build Languages passed in args    #
+# ################################################ #
+
+for lang in "$@"
+do
+
+  GET=tree-sitter-$lang
+  OUT="$PWD/lib/libtree-sitter-$lang.$EXT"
+
+  mkdir -p "lib"
+
+  if [ ! -d $GET ]
+  then
+    git clone https://github.com/tree-sitter/$GET
+  fi
+
+  cd $GET/src
+  set +e
+  rm *.o
+  rm *.$EXT
+  rm *.$EXT*
+  set -e
+
+  LDFLAGS="-L$TSS -lstdc++ -ltree-sitter"
+  CFLAGS="-I/usr/include -I/usr/local/include -I/opt/include -I/opt/local/include -I$TSS/lib/include"
+  set +e
+  CFILES=$(ls *.c)
+  CXXFILES=$(ls *.cc *.cpp *.cxx)
+  set -e
+
+  for i in $CFILES; do
+    [ -f "$i" ] || continue
+    $CC $CFLAGS -std=c99 -fPIC -c $i
+  done
+
+  for i in $CXXFILES; do
+    [ -f "$i" ] || continue
+    $CXX $CFLAGS -fPIC -c $i
+  done
+
+  if test -n "$CXXFILES"; then
+    COMP=$CXX
+  else
+    COMP=$CC
+  fi
+
+  $COMP $LDFLAGS -shared *.o -o $OUT
+done
