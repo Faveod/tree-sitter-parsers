@@ -9,12 +9,12 @@ jobs:
      matrix:
        os: [ubuntu, macos]
        lang:
-         # - c
-         # - cpp
-         # - java
+         - c
+         - cpp
+         - java
          - javascript
-         # - ruby
-         # - rust
+         - ruby
+         - rust
     runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v2
