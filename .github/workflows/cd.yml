@@ -28,8 +28,10 @@ jobs:
          # - x86_64-apple-darwin
          # - x86_64h-apple-darwin
          # - i386-apple-darwin
-         - x86_64-w64-mingw32
-         - i686-w64-mingw32
+         #
+         # NOTE: Tese are supported by multiarch/crossbuild but not tree-sitter
+         # - x86_64-w64-mingw32
+         # - i686-w64-mingw32
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
