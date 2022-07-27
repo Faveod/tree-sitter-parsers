@@ -8,12 +8,17 @@ jobs:
      fail-fast: false
      matrix:
        lang:
+         - bash
          - c
-         # - cpp
-         # - java
-         # - javascript
-         # - ruby
-         # - rust
+         - cpp
+         - embedded-template
+         - html
+         - java
+         - javascript
+         - python
+         - ruby
+         - rust
+         - sexp
        triplet:
          - x86_64-linux-gnu
          - arm-linux-gnueabi
@@ -58,12 +63,17 @@ jobs:
      fail-fast: false
      matrix:
        lang:
+         - bash
          - c
-         # - cpp
-         # - java
-         # - javascript
-         # - ruby
-         # - rust
+         - cpp
+         - embedded-template
+         - html
+         - java
+         - javascript
+         - python
+         - ruby
+         - rust
+         - sexp
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
