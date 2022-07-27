@@ -18,7 +18,6 @@ jobs:
          - python
          - ruby
          - rust
-         - sexp
        triplet:
          - x86_64-linux-gnu
          - arm-linux-gnueabi
@@ -73,7 +72,6 @@ jobs:
          - python
          - ruby
          - rust
-         - sexp
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
