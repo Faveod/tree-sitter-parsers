@@ -3,11 +3,10 @@ name: cd
 on: [push]
 
 jobs:
-  build:
+  build-ubuntu:
     strategy:
      fail-fast: false
      matrix:
-       os: [ubuntu, macos]
        lang:
          - c
          # - cpp
@@ -31,15 +30,41 @@ jobs:
          # - i386-apple-darwin
          - x86_64-w64-mingw32
          - i686-w64-mingw32
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build ${{ matrix.lang }} for ${{ matrix.triplet }}
-        if: ${{ matrix.os == 'ubuntu' }}
         run: |
           docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.triplet }} multiarch/crossbuild  ./lang ${{ matrix.lang }}
       - name: Build ${{ matrix.lang }} for macos
         if: ${{ matrix.os == 'macos' }}
+        run: |
+          ./lang ${{ matrix.lang }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.vars.outputs.sha_short }}
+          release_name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
+          draft: true
+          files: |
+            ./lib/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    strategy:
+     fail-fast: false
+     matrix:
+       lang:
+         - c
+         # - cpp
+         # - java
+         # - javascript
+         # - ruby
+         # - rust
+    runs-on: macos-latest
+    steps:
+      - name: Build ${{ matrix.lang }} for macos
         run: |
           ./lang ${{ matrix.lang }}
       - name: Release
