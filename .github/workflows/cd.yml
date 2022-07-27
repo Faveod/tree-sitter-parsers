@@ -9,12 +9,12 @@ jobs:
      matrix:
        lang:
          - c
-         - cpp
-         - java
-         - javascript
-         - ruby
-         - rust
-       triplets:
+         # - cpp
+         # - java
+         # - javascript
+         # - ruby
+         # - rust
+       triplet:
          - x86_64-linux-gnu
          - arm-linux-gnueabi
          - arm-linux-gnueabihf
