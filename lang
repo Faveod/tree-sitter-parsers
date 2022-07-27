@@ -28,10 +28,10 @@ TSS="$PWD/tree-sitter" # Tree Sitter Source
 if [ ! -d "$TSS" ]
 then
   git clone https://github.com/tree-sitter/tree-sitter
-  pushd tree-sitter
+  cd tree-sitter
   git checkout tags/v0.20.6
   make
-  popd
+  cd ..
 fi
 
 
