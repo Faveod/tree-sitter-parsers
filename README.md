@@ -1,18 +1,18 @@
 # Tree-Sitter Build Parsers
 
-[![cd](https://github.com/stackmystack/tree-sitter-parsers/actions/workflows/cd.yml/badge.svg)](https://github.com/stackmystack/tree-sitter-parsers/actions/workflows/cd.yml)
+[![cd](https://github.com/Faveod/tree-sitter-parsers/actions/workflows/cd.yml/badge.svg)](https://github.com/Faveod/tree-sitter-parsers/actions/workflows/cd.yml)
 
 This repository contains a script to create your favourite shared library
 `tree-sitter-{parser}`.
 
-The official repositories don't have a `Makefile` for generated parsers,
-so this is like a special `Makefile`.
+The official repositories don't have a `Makefile` for generated parsers, so this
+is like a special `Makefile`.
 
-We also have the libraries pushed as artifacts through CI/CD. Check [Rleseases]().
+We also have the libraries pushed as artifacts through CI/CD. Check
+[Rleseases]().
 
-I created this for [`grenadier`](https://github.com/stackmystack/grenadier), the
-ruby `tree-sitter` bindings.
-
+This repository was created for
+[`ruby-tree-sitter`](https://github.com/Faveod/ruby-tree-sitter).
 ## Usage
 
 ``` console
