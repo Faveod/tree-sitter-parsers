@@ -31,7 +31,7 @@ then
   cd tree-sitter
   git checkout tags/v0.20.6
   make
-  rm libtree-sitter.so* # keep .a to statically link the .so
+  rm libtree-sitter."$EXT"* # keep .a to statically link the .so
   file libtree-sitter.a
   cd ..
 fi
