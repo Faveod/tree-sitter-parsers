@@ -9,7 +9,7 @@ The official repositories don't have a `Makefile` for generated parsers, so this
 is like a special `Makefile`.
 
 We also have the libraries pushed as artifacts through CI/CD. Check
-[Rleseases]().
+[Releases](https://github.com/Faveod/tree-sitter-parsers/releases).
 
 This repository was created for
 [`ruby-tree-sitter`](https://github.com/Faveod/ruby-tree-sitter).
