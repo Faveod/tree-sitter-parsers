@@ -58,6 +58,9 @@ do
   if [ ! -d $GET ]
   then
     git clone https://github.com/tree-sitter/$GET
+    cd $GET
+    git checkout "$(git describe --tags "$(git rev-list --tags --max-count=1)")"
+    cd ..
   fi
 
   cd $GET/src
