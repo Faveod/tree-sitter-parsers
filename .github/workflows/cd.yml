@@ -19,13 +19,18 @@ jobs:
          - python
          - ruby
          - rust
-       triplet:
-         - x86_64-linux-gnu
-         - arm-linux-gnueabi
-         - arm-linux-gnueabihf
-         - aarch64-linux-gnu
-         - mipsel-linux-gnu
-         - powerpc64le-linux-gnu
+       target:
+         - { platform: linux-arm,   triplet: arm-linux-gnueabi }
+         - { platform: linux-arm64, triplet: aarch64-linux-gnu }
+         - { platform: linux-x64,   triplet: x86_64-linux-gnu }
+         # NOTE:
+         # Now that we depend in tree-sitter-cli to regenerate the pulled parser
+         # all these platform doesn't make any sense. They're simply unsupported
+         # in the releases of tree-sitter.
+         #  - arm-linux-gnueabihf
+         #  - aarch64-linux-gnu
+         #  - mipsel-linux-gnu
+         #  - powerpc64le-linux-gnu
          #
          # FIXME: tree-sitter has a known (by me) bug by now:
          #          ld: unknown option -soname
@@ -40,13 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build ${{ matrix.lang }} for ${{ matrix.triplet }}
+      - name: Build ${{ matrix.lang }} for ${{ matrix.target.platform }}
         run: |
-          docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.triplet }} multiarch/crossbuild  ./lang ${{ matrix.lang }}
-      - name: Build ${{ matrix.lang }} for macos
-        if: ${{ matrix.os == 'macos' }}
-        run: |
-          ./lang ${{ matrix.lang }}
+          docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.target.triplet }} -e PLATFORM=${{ matrix.target.platform }} multiarch/crossbuild  ./lang d ${{ matrix.lang }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -78,8 +79,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build ${{ matrix.lang }} for macos
+        env:
+          PLATFORM: "macos-x64"
         run: |
-          ./lang ${{ matrix.lang }}
+          ./lang d ${{ matrix.lang }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:

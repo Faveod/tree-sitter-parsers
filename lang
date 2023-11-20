@@ -1,57 +1,93 @@
 #! /usr/bin/env sh
 
+# Usage:
+#
+# ./lang [s|d] parser1 parser2 …
+#
+# where:
+#   [s|d]              = one of `s` or `d` for static or dynamic compilation,
+#                        respectively
+#   parser1, parser2 … = the names of the parsers to built from
+#                        https://www.github.com/tree-sitter/tree-sitter-$parserX …
+
 set -e
 set -x
 
+# Define the platform-specific:
+#
+# 1. static and dynamic extentions
+# 2. the compilers
+
+static="a"
 case "$OSTYPE" in
   darwin*)
-      EXT=dylib
       CC=cc
       CXX=c++
+      dynamic="dylib"
       ;;
   *)
-      EXT=so
       CC=gcc
       CXX=g++
+      dynamic="so"
       ;;
 esac
+
+# Define:
+#
+# 1. the output extension
+# 2. the libtree-sitter extension to delete (to force a static or dynamic
+#    compilation)
+# 3. the parsers
+build=$1             # s = static | d = dynamic
+extout=$dynamic      # output is always a dynamic lib
+if [ "s" = $build ]
+then
+  extrem=$static 
+else
+  extrem=$dynamic
+fi
+shift
+parsers=$@ # the names of the parsers
 
 # ################################################ #
 #          Clone and Build tree-sitter             #
 # ################################################ #
-#
-# NOTE: we delete produced .{dylib, so} files because they just mess with static
-# building step
 
+tstag="0.20.8"
 TSS="$PWD/tree-sitter" # Tree Sitter Source
 
 if [ ! -d "$TSS" ]
 then
   git clone https://github.com/tree-sitter/tree-sitter
   cd tree-sitter
-  git checkout tags/v0.20.8
+  git checkout "tags/v$tstag"
   make
-  rm libtree-sitter."$EXT"* # keep .a to statically link the .so
-  file libtree-sitter.a
+  rm libtree-sitter*.$extrem* 
   cd ..
 fi
 
+# Get tree-sitter-cli
+
+if [ -n "$PLATFORM" ]
+then
+  arch=$(uname -m)
+  wget "https://github.com/tree-sitter/tree-sitter/releases/download/v$tstag/tree-sitter-$PLATFORM.gz"
+fi
 
 # ################################################ #
 #     Clone then Build Languages passed in args    #
 # ################################################ #
 
-for lang in "$@"
+for lang in "$parsers"
 do
 
   GET=tree-sitter-$lang
-  if [ -z "$CROSS_TRIPLE" ]
+  if [ -z "$PLATFORM" ]
   then
-    OUT="$PWD/lib/libtree-sitter-$lang.$EXT"
+    OUT="$PWD/lib/libtree-sitter-$lang.$extout"
   else
-    OUT="$PWD/lib/libtree-sitter-$lang-$CROSS_TRIPLE.$EXT"
+    OUT="$PWD/lib/libtree-sitter-$lang-$PLATFORM.$extout"
   fi
-
 
   mkdir -p "lib"
 
@@ -66,8 +102,7 @@ do
   cd $GET/src
   set +e
   rm *.o
-  rm *.$EXT
-  rm *.$EXT*
+  rm *.$extout*
   set -e
 
   LDFLAGS="-L$TSS -lstdc++ -ltree-sitter"
