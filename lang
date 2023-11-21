@@ -70,8 +70,11 @@ fi
 
 if [ -n "$PLATFORM" ]
 then
-  arch=$(uname -m)
-  wget "https://github.com/tree-sitter/tree-sitter/releases/download/v$tstag/tree-sitter-$PLATFORM.gz"
+  cli="tree-sitter-$PLATFORM"
+  gz="$cli.gz"
+  wget "https://github.com/tree-sitter/tree-sitter/releases/download/v$tstag/$gz"
+  gunzip "$gz"
+  chmod +x "$cli"
 fi
 
 # ################################################ #
@@ -99,7 +102,11 @@ do
     cd ..
   fi
 
-  cd $GET/src
+  # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
+  cd $GET
+  ../$cli generate
+  # clean
+  cd src
   set +e
   rm *.o
   rm *.$extout*
