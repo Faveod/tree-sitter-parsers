@@ -20,8 +20,8 @@ jobs:
          - ruby
          - rust
        target:
-         - { platform: linux-arm,   triplet: arm-linux-gnueabi }
-         - { platform: linux-arm64, triplet: aarch64-linux-gnu }
+         # - { platform: linux-arm,   triplet: arm-linux-gnueabi }
+         # - { platform: linux-arm64, triplet: aarch64-linux-gnu }
          - { platform: linux-x64,   triplet: x86_64-linux-gnu }
          # NOTE:
          # Now that we depend in tree-sitter-cli to regenerate the pulled parser
@@ -46,8 +46,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build ${{ matrix.lang }} for ${{ matrix.target.platform }}
+        env:
+          PLATFORM: ${{ matrix.target.platform }}
         run: |
-          docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.target.triplet }} -e PLATFORM=${{ matrix.target.platform }} multiarch/crossbuild  ./lang d ${{ matrix.lang }}
+          ./lang d ${{ matrix.lang }}
+          # docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.target.triplet }} -e PLATFORM=${{ matrix.target.platform }} multiarch/crossbuild  ./lang d ${{ matrix.lang }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
