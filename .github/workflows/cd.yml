@@ -10,7 +10,7 @@ jobs:
        lang:
          - bash
          - c
-         - cpp
+         # - cpp # FIXME: `lang` needs to handle things differently maybe because it won't generate for this
          - embedded-template
          - html
          - java
