@@ -96,21 +96,34 @@ do
 
   if [ ! -d $GET ]
   then
+    echo "> $lang: cloning"
     git clone https://github.com/tree-sitter/$GET
     cd $GET
-    git checkout "$(git describe --tags "$(git rev-list --tags --max-count=1)")"
+    # Checkout the fixed ref.
+    checkout=$(cat ref | grep "^$lang:" | cut -d ':' -f 2)
+    if [ -z "$checkout" ]
+    then
+      echo "> $lang: using HEAD. Are you sure?"
+    else
+      echo "> $lang: checking out $checkout"
+      git checkout "$checkout"
+    fi
     cd ..
   fi
 
   # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
   cd $GET
+  echo "> $lang: regenerating"
   ../$cli generate
   # clean
+  echo "> $lang: cleaning"
   cd src
   set +e
   rm *.o
   rm *.$extout*
   set -e
+
+  echo "> $lang: compiling"
 
   LDFLAGS="-L$TSS -lstdc++ -ltree-sitter"
   CFLAGS="-I/usr/include -I/usr/local/include -I/opt/include -I/opt/local/include -I$TSS/lib/include"
@@ -136,4 +149,6 @@ do
   fi
 
   $COMP $LDFLAGS -shared *.o -o $OUT
+
+  echo "> $lang: done"
 done
