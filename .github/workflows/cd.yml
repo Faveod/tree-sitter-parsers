@@ -96,3 +96,18 @@ jobs:
             ./lib/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-fixed-assets:
+    needs: [build-ubuntu, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.vars.outputs.sha_short }}
+          release_name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
+          draft: true
+          files: |
+            ref
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
