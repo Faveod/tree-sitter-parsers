@@ -69,7 +69,7 @@ jobs:
        lang:
          - bash
          - c
-         - cpp
+        #  - cpp
          - embedded-template
          - html
          - java
