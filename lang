@@ -53,7 +53,7 @@ parsers=$@ # the names of the parsers
 #          Clone and Build tree-sitter             #
 # ################################################ #
 
-tstag="0.20.8"
+tstag="0.20.9"
 TSS="$PWD/tree-sitter" # Tree Sitter Source
 
 if [ ! -d "$TSS" ]
