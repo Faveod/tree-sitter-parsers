@@ -55,7 +55,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.vars.outputs.sha_short }}
-          release_name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
+          name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
           draft: true
           files: |
             ./lib/*
@@ -90,7 +90,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.vars.outputs.sha_short }}
-          release_name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
+          name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
           draft: true
           files: |
             ./lib/*
@@ -105,7 +105,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.vars.outputs.sha_short }}
-          release_name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
+          name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
           draft: true
           files: |
             ref
