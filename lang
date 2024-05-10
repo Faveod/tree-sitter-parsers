@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+#! /usr/bin/env bash
 
 # Usage:
 #
@@ -47,7 +47,6 @@ else
   extrem=$dynamic
 fi
 shift
-parsers=$@ # the names of the parsers
 
 # ################################################ #
 #          Clone and Build tree-sitter             #
@@ -75,13 +74,16 @@ then
   wget "https://github.com/tree-sitter/tree-sitter/releases/download/v$tstag/$gz"
   gunzip "$gz"
   chmod +x "$cli"
+  cli="../$cli"
+else
+  cli="tree-sitter"
 fi
 
 # ################################################ #
 #     Clone then Build Languages passed in args    #
 # ################################################ #
 
-for lang in "$parsers"
+for lang in "$@"
 do
 
   GET=tree-sitter-$lang
@@ -98,23 +100,23 @@ do
   then
     echo "> $lang: cloning"
     git clone https://github.com/tree-sitter/$GET
-    cd $GET
-    # Checkout the fixed ref.
-    checkout=$(cat ref | grep "^$lang:" | cut -d ':' -f 2)
-    if [ -z "$checkout" ]
-    then
-      echo "> $lang: using HEAD. Are you sure?"
-    else
-      echo "> $lang: checking out $checkout"
-      git checkout "$checkout"
-    fi
-    cd ..
   fi
 
+  # Checkout the fixed ref.
+  checkout=$(cat $PWD/ref | grep "^$lang:" | cut -d ':' -f 2)
+  cd $GET
+  if [ -z "$checkout" ]
+  then
+    echo "> $lang: using HEAD. Are you sure?"
+  else
+    echo "> $lang: checking out $checkout"
+    git checkout "$checkout"
+  fi
+  cd ..
   # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
   cd $GET
   echo "> $lang: regenerating"
-  ../$cli generate --
+  $cli generate --
   # clean
   echo "> $lang: cleaning"
   cd src
@@ -125,7 +127,7 @@ do
   cd -
 
   echo "> $lang: compiling"
-  ../$cli build --output $OUT
+  $cli build --output $OUT
 
   echo "> $lang: done"
 done
