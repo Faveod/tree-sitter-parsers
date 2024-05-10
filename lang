@@ -42,7 +42,7 @@ build=$1             # s = static | d = dynamic
 extout=$dynamic      # output is always a dynamic lib
 if [ "s" = $build ]
 then
-  extrem=$static 
+  extrem=$static
 else
   extrem=$dynamic
 fi
@@ -53,7 +53,7 @@ parsers=$@ # the names of the parsers
 #          Clone and Build tree-sitter             #
 # ################################################ #
 
-tstag="0.20.9"
+tstag="0.22.6"
 TSS="$PWD/tree-sitter" # Tree Sitter Source
 
 if [ ! -d "$TSS" ]
@@ -62,7 +62,7 @@ then
   cd tree-sitter
   git checkout "tags/v$tstag"
   make
-  rm libtree-sitter*.$extrem* 
+  rm libtree-sitter*.$extrem*
   cd ..
 fi
 
@@ -114,7 +114,7 @@ do
   # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
   cd $GET
   echo "> $lang: regenerating"
-  ../$cli generate
+  ../$cli generate --
   # clean
   echo "> $lang: cleaning"
   cd src
@@ -122,33 +122,10 @@ do
   rm *.o
   rm *.$extout*
   set -e
+  cd -
 
   echo "> $lang: compiling"
-
-  LDFLAGS="-L$TSS -lstdc++ -ltree-sitter"
-  CFLAGS="-I/usr/include -I/usr/local/include -I/opt/include -I/opt/local/include -I$TSS/lib/include"
-  set +e
-  CFILES=$(ls *.c)
-  CXXFILES=$(ls *.cc *.cpp *.cxx)
-  set -e
-
-  for i in $CFILES; do
-    [ -f "$i" ] || continue
-    $CC $CFLAGS -std=c99 -fPIC -c $i
-  done
-
-  for i in $CXXFILES; do
-    [ -f "$i" ] || continue
-    $CXX $CFLAGS -fPIC -c $i
-  done
-
-  if test -n "$CXXFILES"; then
-    COMP=$CXX
-  else
-    COMP=$CC
-  fi
-
-  $COMP $LDFLAGS -shared *.o -o $OUT
+  ../$cli build --output $OUT
 
   echo "> $lang: done"
 done

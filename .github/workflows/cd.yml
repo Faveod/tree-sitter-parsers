@@ -50,7 +50,6 @@ jobs:
           PLATFORM: ${{ matrix.target.platform }}
         run: |
           ./lang d ${{ matrix.lang }}
-          # docker run --rm -v $(pwd):/workdir -e CROSS_TRIPLE=${{ matrix.target.triplet }} -e PLATFORM=${{ matrix.target.platform }} multiarch/crossbuild  ./lang d ${{ matrix.lang }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -83,7 +82,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build ${{ matrix.lang }} for macos
         env:
-          PLATFORM: "macos-x64"
+          PLATFORM: "macos-arm64"
         run: |
           ./lang d ${{ matrix.lang }}
       - name: Release
