@@ -1,0 +1,31 @@
+# /usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+set -vx
+
+case "$OSTYPE" in
+  darwin*)
+      ext="dylib"
+      ;;
+  *)
+      ext="so"
+      ;;
+esac
+
+version_num=$(git describe --tags --abbrev=0 | sed -E 's/v([0-9]+\.[0-9]+)/\1/')
+
+pkg="tree-sitter-parsers"
+pkg_name="$pkg-$version_num-$PLATFORM"
+rm -rf "$pkg"
+
+dst=$pkg
+dst_escaped=$(printf '%s\n' "$dst" | sed -e 's/[\/&]/\\&/g')
+mkdir "$dst"
+
+for i in lib/*-"$PLATFORM"."$ext"
+do
+  cp $i $(echo $i | sed -E "s/^(lib\/)(.*)-$PLATFORM(\.$ext)$/$dst_escaped\/\2\3/")
+done
+
+zip "lib/$pkg_name.zip" "$dst"/*
+tar -cvzf "lib/$pkg_name.tar.gz" "$dst"/*
