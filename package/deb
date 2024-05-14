@@ -1,0 +1,38 @@
+# /usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+set -vx
+
+arch=$(dpkg-architecture -q DEB_BUILD_ARCH)
+version_num=$(git describe --tags --abbrev=0 | sed -E 's/v([0-9]+\.[0-9]+)/\1/')
+commit_count=$(git rev-list --count --first-parent HEAD)
+
+version="$version_num.$commit_count"
+echo
+
+pkg='tree-sitter-parsers'
+pkg_name="$pkg-$version_num-$arch"
+rm -rf "$pkg"
+
+debian="$pkg/DEBIAN"
+mkdir -p "$debian"
+
+dst="$pkg/usr/local/lib"
+dst_escaped=$(printf '%s\n' "$dst" | sed -e 's/[\/&]/\\&/g')
+mkdir -p "$dst"
+
+cat <<-EOF > "$debian/control"
+	Package: $pkg
+	Version: $version
+	Architecture: $arch
+	Maintainer: Firas al-Khalil <firas.al-khalil@faveod.com>
+	Description: A bunch of tree-sitter parsers.
+EOF
+
+for i in lib/*-"$PLATFORM".so
+do
+  cp $i $(echo $i | sed -E "s/^(lib\/)(.*)-$PLATFORM(\.so)$/$dst_escaped\/\2\3/")
+done
+
+dpkg-deb --build "$pkg" "lib/$pkg_name.deb"
+

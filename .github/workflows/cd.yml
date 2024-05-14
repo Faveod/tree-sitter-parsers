@@ -3,88 +3,30 @@ name: cd
 on: [push]
 
 jobs:
-  build-ubuntu:
+  build:
     strategy:
      fail-fast: false
      matrix:
-       lang:
-         - bash
-         - c
-         # - cpp # FIXME: `lang` needs to handle things differently maybe because it won't generate for this
-         - embedded-template
-         - html
-         - java
-         - javascript
-         - json
-         - python
-         - ruby
-         - rust
        target:
-         # - { platform: linux-arm,   triplet: arm-linux-gnueabi }
-         # - { platform: linux-arm64, triplet: aarch64-linux-gnu }
-         - { platform: linux-x64,   triplet: x86_64-linux-gnu }
-         # NOTE:
-         # Now that we depend in tree-sitter-cli to regenerate the pulled parser
-         # all these platform doesn't make any sense. They're simply unsupported
-         # in the releases of tree-sitter.
-         #  - arm-linux-gnueabihf
-         #  - aarch64-linux-gnu
-         #  - mipsel-linux-gnu
-         #  - powerpc64le-linux-gnu
-         #
-         # FIXME: tree-sitter has a known (by me) bug by now:
-         #          ld: unknown option -soname
-         # It should be patched to support
-         # - x86_64-apple-darwin
-         # - x86_64h-apple-darwin
-         # - i386-apple-darwin
-         #
-         # NOTE: Tese are supported by multiarch/crossbuild but not tree-sitter
-         # - x86_64-w64-mingw32
-         # - i686-w64-mingw32
-    runs-on: ubuntu-latest
+          - { os: ubuntu-latest, platform: linux-x64 }
+          - { os: macos-latest, platform: macos-arm64 }
+    runs-on: ${{ matrix.target.os }}
+    env:
+      PLATFORM: ${{ matrix.target.platform }}
     steps:
       - uses: actions/checkout@v2
-      - name: Build ${{ matrix.lang }} for ${{ matrix.target.platform }}
-        env:
-          PLATFORM: ${{ matrix.target.platform }}
+      - name: Build for ${{ matrix.target.platform }}
         run: |
-          ./lang d ${{ matrix.lang }}
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.vars.outputs.sha_short }}
-          name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
-          draft: true
-          files: |
-            ./lib/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-macos:
-    strategy:
-     fail-fast: false
-     matrix:
-       lang:
-         - bash
-         - c
-        #  - cpp
-         - embedded-template
-         - html
-         - java
-         - javascript
-         - json
-         - python
-         - ruby
-         - rust
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build ${{ matrix.lang }} for macos
-        env:
-          PLATFORM: "macos-arm64"
+          ./lang d bash c embedded-template html java javascript json python ruby rust
+      - name: Prepare git # To get tags from `git describe`
+        run: git fetch --prune --unshallow
+      - name: Make .deb
+        if: matrix.target.os == 'ubuntu-latest'
         run: |
-          ./lang d ${{ matrix.lang }}
+          ./package/deb
+      - name: Make zip and tar
+        run: |
+          ./package/zip
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -97,10 +39,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-fixed-assets:
-    needs: [build-ubuntu, build-macos]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Prepare git # To get tags from `git describe`
+        run: git fetch --prune --unshallow
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
