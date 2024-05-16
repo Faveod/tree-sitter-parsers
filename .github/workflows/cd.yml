@@ -5,6 +5,8 @@ on:
   push:
     branches:
     - master
+  schedule:
+    - cron: '42 01 * * *'
 
 jobs:
   build:
@@ -26,6 +28,10 @@ jobs:
       - name: Prepare git # To get tags from `git describe`
         run: |
           git fetch --prune --unshallow
+      - name: Update ref file for latest parsers
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          ./update/ref
       - name: Make .deb
         if: matrix.target.os == 'ubuntu-latest'
         run: |
@@ -47,16 +53,20 @@ jobs:
   release-fixed-assets:
     needs: [build]
     runs-on: ubuntu-latest
+    env:
+      DRAFT: ${{ github.event_name == 'schedule' && 'false' || 'true'  }}
+      PRE: ${{ github.event_name == 'schedule' && 'true' || 'false'  }}
     steps:
       - uses: actions/checkout@v2
       - name: Prepare git # To get tags from `git describe`
         run: git fetch --prune --unshallow
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: "Release {draft: ${{ env.DRAFT }}, pre-release: ${{ env.PRE }} }"
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.vars.outputs.sha_short }}
           name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
-          draft: true
+          draft: ${{ env.DRAFT }}
+          prerelease: ${{ env.PRE }}
           files: ref
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
