@@ -52,7 +52,14 @@ shift
 #          Clone and Build tree-sitter             #
 # ################################################ #
 
-tstag="0.22.6"
+tstag=${TREE_SITTER_VERSION:-$(\
+  git                                                                               \
+    -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' \
+    --tags https://github.com/tree-sitter/tree-sitter '*.*.*'                       \
+  | tail --lines=1                                                                  \
+  | cut --delimiter='/' --fields=3                                                  \
+  | sed -E 's/v([0-9]+\.[0-9]+)/\1/'                                                \
+)}
 TSS="$PWD/tree-sitter" # Tree Sitter Source
 
 if [ ! -d "$TSS" ]

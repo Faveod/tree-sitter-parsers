@@ -13,6 +13,7 @@ jobs:
     runs-on: ${{ matrix.target.os }}
     env:
       PLATFORM: ${{ matrix.target.platform }}
+      TREE_SITTER_VERSION: 0.22.6
     steps:
       - uses: actions/checkout@v2
       - name: Build for ${{ matrix.target.platform }}
