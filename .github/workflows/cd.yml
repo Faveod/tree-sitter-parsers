@@ -63,10 +63,11 @@ jobs:
       - name: "Release {draft: ${{ env.DRAFT }}, pre-release: ${{ env.PRE }} }"
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.vars.outputs.sha_short }}
           name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
           draft: ${{ env.DRAFT }}
           prerelease: ${{ env.PRE }}
           files: ref
+          tag_name: ${{ steps.vars.outputs.sha_short }}
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
