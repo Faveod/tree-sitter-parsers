@@ -34,5 +34,5 @@ do
   cp $i $(echo $i | sed -E "s/^(lib\/)(.*)-$PLATFORM(\.so)$/$dst_escaped\/\2\3/")
 done
 
-dpkg-deb --build "$pkg" "lib/$pkg_name.deb"
+dpkg-deb -Z xz --build "$pkg" "lib/$pkg_name.deb"
 
