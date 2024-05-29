@@ -59,6 +59,20 @@ root=$(realpath "$PWD")
 #          Clone and Build tree-sitter             #
 # ################################################ #
 
+# Get tree-sitter-cli
+
+if [ -n "$PLATFORM" ]
+then
+  cli="tree-sitter-$PLATFORM"
+  gz="$cli.gz"
+  wget "https://github.com/tree-sitter/tree-sitter/releases/download/v$tstag/$gz"
+  gunzip "$gz"
+  chmod +x "$cli"
+  cli="$root/$cli"
+else
+  cli="tree-sitter"
+fi
+
 tstag=${TREE_SITTER_VERSION:-$(\
   git                                                                               \
     -c 'versionsort.suffix=-' ls-remote --exit-code --refs --sort='version:refname' \
@@ -77,20 +91,6 @@ then
   make
   rm libtree-sitter*.$extrem*
   cd ..
-fi
-
-# Get tree-sitter-cli
-
-if [ -n "$PLATFORM" ]
-then
-  cli="tree-sitter-$PLATFORM"
-  gz="$cli.gz"
-  wget "https://github.com/tree-sitter/tree-sitter/releases/download/v$tstag/$gz"
-  gunzip "$gz"
-  chmod +x "$cli"
-  cli="../$cli"
-else
-  cli="tree-sitter"
 fi
 
 # ################################################ #
