@@ -140,7 +140,7 @@ do
     git checkout "$checkout"
   fi
   # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
-  if [ "$lang" == "php" ]; then
+  if [ "$lang" = "php" ]; then
     cd php
     compile
     cd ../php_only
