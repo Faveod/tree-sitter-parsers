@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build for ${{ matrix.target.platform }}
         run: |
-          ./lang d bash c embedded-template html java javascript json python ruby rust
+          ./lang d
       - name: Prepare git # To get tags from `git describe`
         run: |
           git fetch --prune --unshallow

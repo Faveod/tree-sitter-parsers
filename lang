@@ -116,7 +116,13 @@ compile() {
   $cli build --output $out
 }
 
-for lang in "$@"
+if [ $# -eq 1 ] || [ "$2" = "all" ]; then
+    langs=$(cut -d ':' -f 1 ref)
+else
+    langs="$@"
+fi
+
+for lang in $langs
 do
   cd $root
   GET=tree-sitter-$lang
