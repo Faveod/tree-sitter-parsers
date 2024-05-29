@@ -48,6 +48,12 @@ else
 fi
 shift
 
+if [ $# -eq 0 ] || [ "$1" = "all" ]; then
+    langs=$(cut -d ':' -f 1 ref)
+else
+    langs="$@"
+fi
+
 root=$(realpath "$PWD")
 # ################################################ #
 #          Clone and Build tree-sitter             #
@@ -115,12 +121,6 @@ compile() {
   echo "> $where: compiling"
   $cli build --output $out
 }
-
-if [ $# -eq 1 ] || [ "$2" = "all" ]; then
-    langs=$(cut -d ':' -f 1 ref)
-else
-    langs="$@"
-fi
 
 for lang in $langs
 do
