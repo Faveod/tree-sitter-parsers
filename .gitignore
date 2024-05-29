@@ -1,2 +1,13 @@
 lib/
 tree-sitter*/
+bash/
+c/
+embedded-template/
+html/
+java/
+javascript/
+json/
+php/
+python/
+ruby/
+rust/

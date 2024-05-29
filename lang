@@ -48,6 +48,7 @@ else
 fi
 shift
 
+root=$(realpath "$PWD")
 # ################################################ #
 #          Clone and Build tree-sitter             #
 # ################################################ #
@@ -90,45 +91,20 @@ fi
 #     Clone then Build Languages passed in args    #
 # ################################################ #
 
-top=$(pwd)
-
-for lang in "$@"
-do
-
-  cd "$top"
-  GET=tree-sitter-$lang
+compile() {
+  where=$(basename $PWD)
   if [ -z "$PLATFORM" ]
   then
-    OUT="$PWD/lib/libtree-sitter-$lang.$extout"
+    out="$root/lib/libtree-sitter-$where.$extout"
   else
-    OUT="$PWD/lib/libtree-sitter-$lang-$PLATFORM.$extout"
+    out="$root/lib/libtree-sitter-$where-$PLATFORM.$extout"
   fi
-
-  mkdir -p "lib"
-
-  if [ ! -d $GET ]
-  then
-    echo "> $lang: cloning"
-    git clone https://github.com/tree-sitter/$GET
-  fi
-
-  # Checkout the fixed ref.
-  checkout=$(cat $PWD/ref | grep "^$lang:" | cut -d ':' -f 2)
-  cd $GET
-  if [ -z "$checkout" ]
-  then
-    echo "> $lang: using HEAD. Are you sure?"
-  else
-    echo "> $lang: checking out $checkout"
-    git checkout "$checkout"
-  fi
-  cd -
-  # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
-  cd $GET
-  echo "> $lang: regenerating"
+  # Regenerate the parser.
+  # Check https://github.com/tree-sitter/tree-sitter/issues/2731
+  echo "> $where: regenerating"
   $cli generate --
   # clean
-  echo "> $lang: cleaning"
+  echo "> $where: cleaning"
   cd src
   set +e
   rm *.o
@@ -136,8 +112,40 @@ do
   set -e
   cd -
 
-  echo "> $lang: compiling"
-  $cli build --output $OUT
+  echo "> $where: compiling"
+  $cli build --output $out
+}
 
-  echo "> $lang: done"
+for lang in "$@"
+do
+  cd $root
+  GET=tree-sitter-$lang
+
+  mkdir -p "lib"
+
+  if [ ! -d $GET ]
+  then
+    echo "> $lang: cloning"
+    git clone https://github.com/tree-sitter/$GET $lang
+  fi
+
+  # Checkout the fixed ref.
+  checkout=$(sed -n -e "/^$lang:/{s///;p;q;}" ref)
+  cd $lang
+  if [ -z "$checkout" ]
+  then
+    echo "> $lang: using HEAD. Are you sure?"
+  else
+    echo "> $lang: checking out $checkout"
+    git checkout "$checkout"
+  fi
+  # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
+  if [ "$lang" == "php" ]; then
+    cd php
+    compile
+    cd ../php_only
+    compile
+  else
+    compile
+  fi
 done
