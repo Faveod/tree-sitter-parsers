@@ -53,21 +53,31 @@ jobs:
   release-fixed-assets:
     needs: [build]
     runs-on: ubuntu-latest
-    env:
-      DRAFT: ${{ github.event_name == 'schedule' && 'false' || 'true'  }}
-      PRE: ${{ github.event_name == 'schedule' && 'true' || 'false'  }}
     steps:
       - uses: actions/checkout@v2
       - name: Prepare git # To get tags from `git describe`
         run: git fetch --prune --unshallow
-      - name: "Release {draft: ${{ env.DRAFT }}, pre-release: ${{ env.PRE }} }"
+      - name: Release
+        if: ${{ github.event_name == 'schedule' }}
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
-          draft: ${{ env.DRAFT }}
-          prerelease: ${{ env.PRE }}
+          name: Release
+          draft: true
+          prerelease: false
           files: ref
           tag_name: ${{ steps.vars.outputs.sha_short }}
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Nightly Release
+        uses: softprops/action-gh-release@v2
+        if: ${{ github.event_name != 'schedule' }}
+        with:
+          name: Nightly
+          draft: false
+          prerelease: true
+          files: ref
+          tag_name: nightly
           make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
