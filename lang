@@ -129,22 +129,22 @@ do
 
   mkdir -p "lib"
 
-  if [ ! -d $GET ]
+  checkout=$(sed -n -e "/^$lang:/{s///;p;q;}" ref)
+  if [ -d $lang ]
   then
+    cd "$lang"
+    git reset --hard HEAD
+  else
     echo "> $lang: cloning"
-    git clone https://github.com/tree-sitter/$GET $lang
+    mkdir "$lang"
+    cd "$lang"
+    git init
+    git remote add origin "https://github.com/tree-sitter/$GET"
   fi
 
-  # Checkout the fixed ref.
-  checkout=$(sed -n -e "/^$lang:/{s///;p;q;}" ref)
-  cd $lang
-  if [ -z "$checkout" ]
-  then
-    echo "> $lang: using HEAD. Are you sure?"
-  else
-    echo "> $lang: checking out $checkout"
-    git checkout "$checkout"
-  fi
+  git fetch origin --depth 1 "$checkout"
+  git reset --hard FETCH_HEAD
+
   # Regenerate. See https://github.com/tree-sitter/tree-sitter/issues/2731
   if [ "$lang" = "php" ]; then
     cd php
