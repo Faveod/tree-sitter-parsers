@@ -4,16 +4,14 @@ on:
   pull_request:
   push:
     branches:
-    - master
-  schedule:
-    - cron: '42 01 * * *'
+      - master
 
 jobs:
   build:
     strategy:
-     fail-fast: false
-     matrix:
-       target:
+      fail-fast: false
+      matrix:
+        target:
           - { os: ubuntu-latest, platform: linux-x64 }
           - { os: macos-latest, platform: macos-arm64 }
     runs-on: ${{ matrix.target.os }}
@@ -66,18 +64,6 @@ jobs:
           prerelease: false
           files: ref
           tag_name: ${{ steps.vars.outputs.sha_short }}
-          make_latest: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Nightly Release
-        uses: softprops/action-gh-release@v2
-        if: ${{ github.event_name != 'schedule' }}
-        with:
-          name: Nightly
-          draft: false
-          prerelease: true
-          files: ref
-          tag_name: nightly
           make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
