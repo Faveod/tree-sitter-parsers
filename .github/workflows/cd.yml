@@ -26,10 +26,6 @@ jobs:
       - name: Prepare git # To get tags from `git describe`
         run: |
           git fetch --prune --unshallow
-      - name: Update ref file for latest parsers
-        if: ${{ github.event_name == 'schedule' }}
-        run: |
-          ./update/ref
       - name: Make .deb
         if: matrix.target.os == 'ubuntu-latest'
         run: |
