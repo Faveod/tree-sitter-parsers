@@ -32,6 +32,7 @@ case "$OSTYPE" in
       ;;
 esac
 
+sep='|'
 # Define:
 #
 # 1. the output extension
@@ -49,7 +50,7 @@ fi
 shift
 
 if [ $# -eq 0 ] || [ "$1" = "all" ]; then
-    langs=$(cut -d ':' -f 1 ref)
+    langs=$(cut -d $sep -f 1 ref)
 else
     langs="$@"
 fi
@@ -122,16 +123,20 @@ compile() {
   $cli build --output $out
 }
 
-for lang in $langs
-do
+for lang in $langs; do
   cd $root
   GET=tree-sitter-$lang
 
   mkdir -p "lib"
 
-  checkout=$(sed -n -e "/^$lang:/{s///;p;q;}" ref)
-  if [ -d $lang ]
-  then
+  info=$(sed -n -e "/^$lang$sep/{s///;p;q;}" ref)
+  checkout=$(echo $info | cut -d"$sep" -f1)
+  repo=$(echo $info | cut -d"$sep" -f2)
+  if [ "$checkout" == "$repo" ]; then
+    repo="https://github.com/tree-sitter/$GET"
+  fi
+
+  if [ -d $lang ]; then
     cd "$lang"
     git reset --hard HEAD
   else
@@ -139,7 +144,7 @@ do
     mkdir "$lang"
     cd "$lang"
     git init
-    git remote add origin "https://github.com/tree-sitter/$GET"
+    git remote add origin $repo
   fi
 
   git fetch origin --depth 1 "$checkout"
