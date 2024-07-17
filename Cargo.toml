@@ -1,0 +1,67 @@
+[package]
+authors = ["Firas al-Khalil <firasalkhalil@gmail.com>"]
+build = "build.rs"
+description = "A genrator of tree-sitter parsers as dynamic or static libraries"
+edition = "2021"
+name = "tree-sitter-parsers"
+version = "3.8.0"
+
+[lib]
+name = "tsp"
+path = "src/lib.rs"
+
+[[bin]]
+name = "tsp"
+path = "src/main.rs"
+
+[package.metadata.tsp]
+build-dir = "tmp"
+fresh = false
+from = "https://github.com/tree-sitter/tree-sitter-"
+out = "parsers"
+ref = "master"
+show-config = false
+static = false
+
+[package.metadata.tree-sitter]
+repo = "https://github.com/tree-sitter/tree-sitter"
+version = "0.22.6"
+
+[dependencies]
+atty = "0.2"
+better-panic = "0.3.0"
+chrono = "0.4"
+clap = { version = "4.5", features = ["derive", "cargo"] }
+clap-verbosity-flag = "2.2"
+derive_more = { version = "1.0", features = ["display"] }
+diff-struct = "0.5"
+enum_dispatch = "0.3"
+figment = { version = "0.10", features = ["toml", "env"] }
+human-panic = "2.0.1"
+indicatif = "0.17"
+log = "0.4"
+miette = { version = "7.2", features = ["fancy"] }
+num_cpus = "1.16"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = [
+  "fs",
+  "process",
+  "rt-multi-thread",
+  "sync",
+] }
+toml = "0.8"
+tracing = "0.1"
+tracing-appender = "0.2"
+tracing-log = "0.2"
+tracing-subscriber = "0.3"
+url = "2.5"
+
+[dev-dependencies]
+anyhow = "1.0"
+assert_fs = "1.1"
+pretty_assertions = "1.4"
+
+[build-dependencies]
+cargo_metadata = "0.18"
+const-str = "0.5"
+serde_json = "1.0"
