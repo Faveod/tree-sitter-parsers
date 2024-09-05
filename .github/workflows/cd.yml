@@ -13,20 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          # - linux-arm
-          # - linux-arm64
           - linux-x64
-          # - linux-x86
           - macos-arm64
-          # - macos-x64
 
         include:
-          # - { platform: linux-arm   , os: ubuntu-latest  }
-          # - { platform: linux-arm64 , os: ubuntu-latest  }
           - { platform: linux-x64, os: ubuntu-latest }
-          # - { platform: linux-x86   , os: ubuntu-latest  }
           - { platform: macos-arm64, os: macos-14 }
-          # - { platform: macos-x64   , os: macos-12       }
     runs-on: ${{ matrix.os }}
     env:
       PLATFORM: ${{ matrix.platform }}

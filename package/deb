@@ -4,14 +4,12 @@ IFS=$'\n\t'
 set -vx
 
 arch=$(dpkg-architecture -q DEB_BUILD_ARCH)
-version_num=$(git describe --tags --abbrev=0 | sed -E 's/v([0-9]+\.[0-9]+)/\1/')
-commit_count=$(git rev-list --count --first-parent HEAD)
+version=$(git describe --tags --abbrev=0 | sed -E 's/v([0-9]+\.[0-9]+)/\1/')
 
-version="$version_num.$commit_count"
 echo
 
 pkg='tree-sitter-parsers'
-pkg_name="$pkg-$version_num-$arch"
+pkg_name="$pkg-$version-$arch"
 rm -rf "$pkg"
 
 debian="$pkg/DEBIAN"
