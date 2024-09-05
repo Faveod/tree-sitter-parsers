@@ -1,0 +1,15 @@
+tree-sitter-version = "0.22.6"
+
+[parsers]
+bash = "7331995b19b8f8aba2d5e26deb51d2195c18bc94"
+c = "212a80f86452bb1316324fa0db730cf52f29e05a"
+cobol = { ref = "c7a36d749e7f1db021588259f2b1b765e59d0c12", from = "https://github.com/yutaro-sakamoto/tree-sitter-cobol" }
+embedded-template = "203f7bd3c1bbfbd98fc19add4b8fcb213c059205"
+html = "949b78051835564bca937565241e5e337d838502"
+java = "953abfc8bb3eb2f578e1f461edba4a9885f974b8"
+javascript = "4928d3d18019a848906855476fde2dc8be030217"
+json = "3fef30de8aee74600f25ec2e319b62a1a870d51e"
+php = "575a0801f430c8672db70b73493c033a9dcfc328"
+python = "82f5c9937fe4300b4bec3ee0e788d642c77aab2c"
+ruby = "788a63ca1b7619288980aaafd37d890ee2469421"
+rust = "9c84af007b0f144954adb26b3f336495cbb320a7"

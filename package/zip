@@ -19,13 +19,9 @@ pkg_name="$pkg-$version_num-$PLATFORM"
 rm -rf "$pkg"
 
 dst=$pkg
-dst_escaped=$(printf '%s\n' "$dst" | sed -e 's/[\/&]/\\&/g')
 mkdir "$dst"
 
-for i in lib/*-"$PLATFORM"."$ext"
-do
-  cp $i $(echo $i | sed -E "s/^(lib\/)(.*)-$PLATFORM(\.$ext)$/$dst_escaped\/\2\3/")
-done
+cp lib/"$PLATFORM"/*."$ext" "$dst"
 
-zip "lib/$pkg_name.zip" "$dst"/*
-tar -cvzf "lib/$pkg_name.tar.gz" "$dst"/*
+zip lib/"$pkg_name.zip" "$dst"/*
+tar -cvzf lib/"$pkg_name.tar.gz" "$dst"/*

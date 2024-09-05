@@ -8,26 +8,43 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.platform }} (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - { os: ubuntu-latest, platform: linux-x64 }
-          - { os: macos-latest, platform: macos-arm64 }
-    runs-on: ${{ matrix.target.os }}
+        platform:
+          # - linux-arm
+          # - linux-arm64
+          - linux-x64
+          # - linux-x86
+          - macos-arm64
+          # - macos-x64
+
+        include:
+          # - { platform: linux-arm   , os: ubuntu-latest  }
+          # - { platform: linux-arm64 , os: ubuntu-latest  }
+          - { platform: linux-x64, os: ubuntu-latest }
+          # - { platform: linux-x86   , os: ubuntu-latest  }
+          - { platform: macos-arm64, os: macos-14 }
+          # - { platform: macos-x64   , os: macos-12       }
+    runs-on: ${{ matrix.os }}
     env:
-      PLATFORM: ${{ matrix.target.platform }}
-      TREE_SITTER_VERSION: 0.22.6
+      PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2
-      - name: Build for ${{ matrix.target.platform }}
+      - name: Download tsdl
         run: |
-          ./lang d
+          curl -o tsdl.gz -L "https://github.com/stackmystack/tsdl/releases/latest/download/tsdl-${{ matrix.platform }}.gz"
+          gunzip tsdl.gz
+          chmod +x tsdl
+      - name: Build
+        run: |
+          ./tsdl build --out-dir lib/${{ matrix.platform}}
       - name: Prepare git # To get tags from `git describe`
         run: |
           git fetch --prune --unshallow
       - name: Make .deb
-        if: matrix.target.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           ./package/deb
       - name: Make zip and tar

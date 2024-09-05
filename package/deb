@@ -18,7 +18,6 @@ debian="$pkg/DEBIAN"
 mkdir -p "$debian"
 
 dst="$pkg/usr/local/lib"
-dst_escaped=$(printf '%s\n' "$dst" | sed -e 's/[\/&]/\\&/g')
 mkdir -p "$dst"
 
 cat <<-EOF > "$debian/control"
@@ -29,10 +28,5 @@ cat <<-EOF > "$debian/control"
 	Description: A bunch of tree-sitter parsers.
 EOF
 
-for i in lib/*-"$PLATFORM".so
-do
-  cp $i $(echo $i | sed -E "s/^(lib\/)(.*)-$PLATFORM(\.so)$/$dst_escaped\/\2\3/")
-done
-
-dpkg-deb -Z none --build "$pkg" "lib/$pkg_name.deb"
-
+cp lib/"$PLATFORM"/*.so "$dst"
+dpkg-deb -Z none --build "$pkg" lib/"$pkg_name".deb
