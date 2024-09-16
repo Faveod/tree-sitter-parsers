@@ -54,23 +54,3 @@ jobs:
             ./lib/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  release-fixed-assets:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare git # To get tags from `git describe`
-        run: git fetch --prune --unshallow
-      - name: Release
-        if: ${{ github.event_name == 'schedule' }}
-        uses: softprops/action-gh-release@v2
-        with:
-          name: Release
-          draft: true
-          prerelease: false
-          files: ref
-          tag_name: ${{ steps.vars.outputs.sha_short }}
-          make_latest: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
