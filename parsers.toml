@@ -1,4 +1,4 @@
-tree-sitter-version = "0.22.6"
+tree-sitter-version = "0.23.0"
 
 [parsers]
 bash = "7331995b19b8f8aba2d5e26deb51d2195c18bc94"
