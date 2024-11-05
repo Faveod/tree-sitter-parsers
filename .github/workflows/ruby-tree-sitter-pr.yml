@@ -1,0 +1,56 @@
+name: Create ruby-tree-sitter Pull Request on Release
+on:
+  push
+  # release:
+  #   types: [published]
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Checkout ruby-tree-sitter
+        uses: actions/checkout@v4
+        with:
+          repository: stackmystack/ruby-tree-sitter
+          token: ${{ secrets.TREE_SITTER_PAT }}
+          path: ruby-tree-sitter
+
+      - name: Get previous releases
+        id: update_versions
+        run: |
+          cd ruby-tree-sitter
+          TREE_SITTER=$(grep 'tree-sitter-version' parsers.toml | sed -E 's/.*"([0-9.]+)".*/\1/')
+          sed -i "s/^\([[:space:]]*\)TREESITTER_VERSION = '.*'/\1TREESITTER_VERSION = '$TREE_SITTER'/"  lib/tree_sitter/version.rb
+          PARSERS=$(echo "${{ github.event.release.tag_name }}" | sed "s/^v//")
+          sed -i "s/(TS_PARSER_VERSION :=  \').*\'/\1$PARSERS\'/" .justfile
+          cd -
+
+          # Setup git config
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@github.com"
+
+          # Create new branch
+          BRANCH="update-parsers-to-$PARSERS"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
+
+          # Add and commit changes
+          git add .
+          git commit -m "Update from ${{ github.repository }} release ${{ github.event.release.tag_name }}"
+          git push origin "$BRANCH"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.TREE_SITTER_PAT }}
+          path: ruby-tree-sitter
+          base: master
+          delete-branch: true
+          draft: false
+          branch: ${{ steps.update_versions.outputs.branch }}
+          title: "Update from ${{ github.repository }} release ${{ github.event.release.tag_name }}"
+          body: |
+            This PR was automatically created to update from ${{ github.repository }} release ${{ github.event.release.tag_name }}.
