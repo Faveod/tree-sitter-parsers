@@ -11,46 +11,85 @@ on:
 jobs:
   build:
     name: ${{ matrix.platform }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    env:
+      PLATFORM: ${{ matrix.platform }}
+
     strategy:
       fail-fast: false
       matrix:
         platform:
           - linux-x64
           - macos-arm64
-
         include:
           - { platform: linux-x64, os: ubuntu-latest }
           - { platform: macos-arm64, os: macos-14 }
-    runs-on: ${{ matrix.os }}
-    env:
-      PLATFORM: ${{ matrix.platform }}
+
     steps:
       - uses: actions/checkout@v2
+
       - name: Download tsdl
         run: |
           curl -o tsdl.gz -L "https://github.com/stackmystack/tsdl/releases/latest/download/tsdl-${{ matrix.platform }}.gz"
           gunzip tsdl.gz
           chmod +x tsdl
+
       - name: Build
         run: |
-          ./tsdl build --out-dir lib/${{ matrix.platform}}
+          ./tsdl build --out-dir lib/${{ matrix.platform }}
+
       - name: Prepare git # To get tags from `git describe`
         run: |
           git fetch --prune --unshallow
+
       - name: Make .deb
         if: matrix.os == 'ubuntu-latest'
         run: |
           ./package/deb
+
       - name: Make zip and tar
         run: |
           ./package/zip
-      - name: Release
-        uses: softprops/action-gh-release@v1
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ steps.vars.outputs.sha_short }}
-          name: Release ${{ github.ref }}-${{ steps.vars.outputs.sha_short }}
-          draft: true
-          files: |
-            ./lib/*
+          name: build-artifacts-${{ matrix.os }}-${{ matrix.platform }}
+          path: |
+            lib/*.deb
+            lib/*.gz
+            lib/*.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Copy parsers.toml
+        run: |
+          cp parsers.toml artifacts/parsers.toml
+
+      - name: Get tag name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.vars.outputs.sha_short }}
+          name: Release ${{ env.TAG_NAME }}-${{ steps.vars.outputs.sha_short }}
+          draft: false
+          files: |
+            artifacts/**
