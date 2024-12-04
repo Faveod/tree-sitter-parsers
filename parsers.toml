@@ -4,12 +4,12 @@ tree-sitter-version = "0.24.4"
 bash = "0.23.0"
 c = "0.23.0"
 cobol = { ref = "c7a36d749e7f1db021588259f2b1b765e59d0c12", from = "https://github.com/yutaro-sakamoto/tree-sitter-cobol" }
-delphi = { ref = "d0ebabefaea9ac3f6fc3004cf08cd121b66da9e4", from = "https://github.com/Isopod/tree-sitter-pascal" }
 embedded-template = "0.23.0"
 html = "0.23.0"
 java = "0.23.0"
 javascript = "0.23.0"
 json = "0.23.0"
+pascal = { ref = "d0ebabefaea9ac3f6fc3004cf08cd121b66da9e4", from = "https://github.com/Isopod/tree-sitter-pascal" }
 php = "0.23.0"
 python = "0.23.0"
 ruby = "0.23.0"
