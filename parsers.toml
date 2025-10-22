@@ -13,5 +13,5 @@ json = "0.24.8"
 pascal = { ref = "d0ebabefaea9ac3f6fc3004cf08cd121b66da9e4", from = "https://github.com/Isopod/tree-sitter-pascal" }
 php = "0.23.11"
 python = "0.23.6"
-ruby = "0.23.1"
+ruby = { from = "https://github.com/Faveod/tree-sitter-ruby", ref = "2dac4f7c97b5e31e46b84ec843882bf8de2193df"}
 rust = "0.23.2"
