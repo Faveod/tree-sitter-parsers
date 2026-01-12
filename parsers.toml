@@ -4,7 +4,9 @@ tree-sitter-version = "0.24.7"
 bash = "0.23.3"
 c = "0.23.4"
 cobol = { from = "https://github.com/yutaro-sakamoto/tree-sitter-cobol", ref = "c7a36d749e7f1db021588259f2b1b765e59d0c12"}
+c-sharp = "0.23.1"
 embedded-template = "0.23.2"
+groovy = { from = "https://github.com/murtaza64/tree-sitter-groovy", ref = "86911590a8e46d71301c66468e5620d9faa5b6af" }
 haml = { from = "https://github.com/vitallium/tree-sitter-haml",  ref = "ff1608c064d48d162861070405e971b9c949367c" }
 html = "0.23.2"
 java = "0.23.5"
