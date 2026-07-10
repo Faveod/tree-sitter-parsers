@@ -1,7 +1,7 @@
 [parsers]
 ada               = { from = "https://github.com/briot/tree-sitter-ada/"           , ref = "6b58259a08b1a22ba0247a7ce30be384db618da6" }
 bash              = "0.23.3"
-c                 = "0.23.4"
+c                 = "0.24.2"
 c-sharp           = { from = "https://github.com/stackmystack/tree-sitter-c-sharp" , ref = "7ae57acf1b2da1d248dae4c684df70d1aecf7b45" }
 cobol             = { from = "https://github.com/yutaro-sakamoto/tree-sitter-cobol", ref = "c7a36d749e7f1db021588259f2b1b765e59d0c12" }
 embedded-template = "0.23.2"
